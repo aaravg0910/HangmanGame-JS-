@@ -7,20 +7,16 @@ class Player {
 }
 
 class Board {
-    constructor() {
-        // Instead of reading a file, we use the phrases from your text file here
-        this.phrases = [
-            "curiosity killed the cat", "world is your oyster", "you need money to make money",
-            "all good things come to those who wait", "two heads are better than one",
-            "dont judge a book by its cover", "piece of cake", "barking up the wrong tree"
-        ];
-        this.phrase = this.phrases[Math.floor(Math.random() * this.phrases.length)];
+    constructor(phraseList) {
+        // Picks a random phrase from the provided list 
+        this.phrase = phraseList[Math.floor(Math.random() * phraseList.length)];
         this.solvedPhrase = "";
         this.initSolved();
     }
 
     initSolved() {
         for (let char of this.phrase) {
+            // Replicates Java logic: spaces become double spaces, letters become underscores
             this.solvedPhrase += (char === " ") ? "  " : "_ ";
         }
     }
@@ -60,12 +56,27 @@ class Board {
 let player1, player2, board, currentPlayer;
 let gameSolved = false;
 
-function startGame() {
+// New function to load the actual phrases.txt file from your GitHub 
+async function loadPhrases() {
+    try {
+        const response = await fetch('phrases.txt');
+        const text = await response.text();
+        // Splits by line and removes empty lines
+        return text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    } catch (e) {
+        console.error("Could not load phrases.txt, using fallback.");
+        return ["curiosity killed the cat"]; 
+    }
+}
+
+async function startGame() {
+    const phraseList = await loadPhrases();
     const n1 = document.getElementById('p1Name').value || "Player 1";
     const n2 = document.getElementById('p2Name').value || "Player 2";
+    
     player1 = new Player(n1);
     player2 = new Player(n2);
-    board = new Board();
+    board = new Board(phraseList);
     currentPlayer = player1;
 
     document.getElementById('setup').style.display = 'none';
@@ -85,18 +96,19 @@ function updateUI() {
 function handleGuess() {
     if (gameSolved) return;
     const input = document.getElementById('guessInput');
-    const guess = input.value.trim().toLowerCase();
+    const guess = input.value.trim();
     const msg = document.getElementById('message');
     if (!guess) return;
 
+    // Full phrase guess: +500
     if (board.isSolved(guess)) {
-        currentPlayer.addPoints(500); [cite: 4]
+        currentPlayer.addPoints(500);
         board.solvedPhrase = board.phrase;
         msg.innerText = `${currentPlayer.name} solved it! +500 pts`;
         gameSolved = true;
     } else if (guess.includes(" ")) {
-        // Word guess logic [cite: 4]
-        if (board.phrase.toLowerCase().includes(guess)) {
+        // Word guess: +150 or -75
+        if (board.phrase.toLowerCase().includes(guess.toLowerCase())) {
             board.revealLetters(guess);
             currentPlayer.addPoints(150);
             msg.innerText = "Correct word! +150 pts";
@@ -105,14 +117,14 @@ function handleGuess() {
             msg.innerText = "Wrong word! -75 pts";
         }
     } else {
-        // Letter guess logic [cite: 4]
+        // Letter guess: +100 per or -50
         if (board.allLettersExist(guess)) {
             let count = board.revealLetters(guess);
             currentPlayer.addPoints(count * 100);
             msg.innerText = `Correct! Found ${count} letters.`;
         } else {
             currentPlayer.addPoints(guess.length * -50);
-            msg.innerText = "Incorrect letter! Points deducted.";
+            msg.innerText = "Incorrect guess! Points deducted.";
         }
     }
 
