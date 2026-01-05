@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Phrase Solver Game</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #f0f0f0; padding: 20px; }
+        #game-container { background: white; padding: 20px; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .phrase { font-size: 24px; letter-spacing: 3px; margin: 20px 0; font-family: monospace; }
+        .stats { display: flex; justify-content: space-around; margin-bottom: 20px; }
+        input { padding: 10px; font-size: 16px; width: 60%; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }
+        #message { margin-top: 15px; font-weight: bold; color: #d9534f; }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>Phrase Solver</h1>
+        <div id="setup">
+            <input type="text" id="p1Name" placeholder="Player 1 Name">
+            <input type="text" id="p2Name" placeholder="Player 2 Name" style="margin-top:10px">
+            <br><br>
+            <button onclick="startGame()">Start Game</button>
+        </div>
+
+        <div id="gameplay" style="display:none;">
+            <div class="stats">
+                <div><strong id="p1Label"></strong>: <span id="p1Points">0</span></div>
+                <div><strong id="p2Label"></strong>: <span id="p2Points">0</span></div>
+            </div>
+            <h2 id="turnDisplay"></h2>
+            <div class="phrase" id="phraseDisplay"></div>
+            <input type="text" id="guessInput" placeholder="Enter letter, word, or phrase">
+            <button onclick="handleGuess()">Guess</button>
+            <p id="message"></p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
